@@ -19,8 +19,6 @@ exports.create = function(req,res){
         } else {
           comment.save().then(function(){
           res.redirect('/quizes/'+req.params.quizId);}
-          ).catch(function(error){next(error);});
-        }
-      }
-    );
+          )}
+        }).catch(function(error){next(error);});
 };
