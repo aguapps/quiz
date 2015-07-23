@@ -31,6 +31,9 @@ exports.index = function(req,res,next){
   }
 };
 
+exports.autor = function(req,res){
+  res.render('author', {errors:[]});
+};
 
 //GET  /quizes/:id
 exports.show = function(req,res){
