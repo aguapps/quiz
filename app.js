@@ -9,7 +9,8 @@ var partials = require('express-partials');
 var methodOverride = require('method-override');
 
 var routes = require('./routes/index');
-
+var tempoSesion = undefined; // Variable para el computo de tiempo
+var tiempoMaximoMinutos = 2; //Tiempo de inactividad en minutos para el cierre de sesión
 var app = express();
 
 // view engine setup
@@ -28,6 +29,24 @@ app.use(cookieParser('Quiz 2015')); //Semilla para cifrar las cookies
 app.use(session());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+//Destruye sesion si ha pasado mas tiempo del establecido
+app.use(function(req, res, next){
+if ( req.session.user ){ // Si el usuario ha iniciado sesión
+    if(tempoSesion===undefined){  //Si aún no se le ha asignado tiempo
+      tempoSesion =Number(new Date()); //Asignamos el tiempo actual
+    } else {
+      if(tempoSesion+(tiempoMaximoMinutos*60*1000)<Number(new Date())){ //Si ya se le había asignado el tiempo comprobamos que no hayan pasado 2 minutos
+        delete req.session.user;
+      } else {
+        tempoSesion =Number(new Date()); //Si hay actividad Asignamos el tiempo actual
+      }
+    }
+} else {
+  tempoSesion = undefined;
+}
+next();
+});
 
 //Helpers dinámicos
 app.use(function(req,res,next){
