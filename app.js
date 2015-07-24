@@ -9,7 +9,6 @@ var partials = require('express-partials');
 var methodOverride = require('method-override');
 
 var routes = require('./routes/index');
-var tempoSesion = undefined; // Variable para el computo de tiempo
 var tiempoMaximoMinutos = 2; //Tiempo de inactividad en minutos para el cierre de sesión
 var app = express();
 
@@ -33,18 +32,22 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Destruye sesion si ha pasado mas tiempo del establecido
 app.use(function(req, res, next){
 if ( req.session.user ){ // Si el usuario ha iniciado sesión
-    if(tempoSesion===undefined){  //Si aún no se le ha asignado tiempo
-      tempoSesion =Number(new Date()); //Asignamos el tiempo actual
+    if(req.session.tiempoSesion === undefined){  //Si aún no se le ha asignado tiempo
+      req.session.tiempoSesion =Number(new Date()); //Asignamos el tiempo actual
     } else {
-      if(tempoSesion+(tiempoMaximoMinutos*60*1000)<Number(new Date())){ //Si ya se le había asignado el tiempo comprobamos que no hayan pasado 2 minutos
-        delete req.session.user;
+      if(req.session.tiempoSesion+(tiempoMaximoMinutos*60*1000)<Number(new Date())){ //Si ya se le había asignado el tiempo comprobamos que no hayan pasado los minutos
+        delete req.session.user; // borra sesión usuario
+        delete req.session.tiempoSesion // borra sesión tiempo
       } else {
-        tempoSesion =Number(new Date()); //Si hay actividad Asignamos el tiempo actual
+        req.session.tiempoSesion =Number(new Date()); //Si hay actividad Asignamos el tiempo actual
       }
     }
 } else {
-  tempoSesion = undefined;
+  if(req.session.tiempoSesion){
+    delete req.session.tiempoSesion;
+  }
 }
+res.locals.session = req.session;
 next();
 });
 
