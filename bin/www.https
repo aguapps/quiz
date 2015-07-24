@@ -19,7 +19,7 @@ var options = {
  * Get port from environment and store in Express.
  */
 
-var port = parseInt(process.env.PORT, 10) || 3000;
+var port = parseInt(process.env.PORT, 10) || 8443;
 app.set('port', port);
 
 /**
@@ -27,7 +27,7 @@ app.set('port', port);
  */
 
 //var server = http.createServer(app);
-var server = http.createServer(app);
+var server = https.createServer(options, app);
 
 /**
  * Listen on provided port, on all network interfaces.
